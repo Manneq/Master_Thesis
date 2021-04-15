@@ -4,24 +4,45 @@ import sklearn.preprocessing
 import plotting
 
 
+"""
+    File for data management functions.
+"""
+
+
 def data_loading(path):
+    """
+        Method to load dataset.
+        param:
+            path - string path to file
+        return:
+            data - pd.DataFrame of data
+    """
     data = pd.read_csv(path)
 
     return data
 
 
 def data_statistics(data):
+    """
+        Method to print and plot dataset statistics.
+        param:
+            data - pf.DataFrame of data
+    """
+    # Distributions for category 1 computation
     categories_1_distribution = data[['category1']].groupby('category1').\
         size().sort_values(ascending=False)
 
+    # Output
     print(categories_1_distribution)
 
+    # Making plot for distributions
     plotting.horizontal_bar_plotting(categories_1_distribution.iloc[:10],
                                      ["Number", "Categories"],
                                      "Top 10 categories 1",
                                      "data/output_data/plots",
                                      font_size=26)
 
+    # Average clients flow box plot creation for categories 1
     av_flow_bbox = []
     top_categories_1 = categories_1_distribution.iloc[:10].index.values
 
@@ -29,6 +50,7 @@ def data_statistics(data):
         av_flow_bbox.append(
             data[data['category1'] == category_1]['av_flow'].values.flatten())
 
+    # Making visualization of box plot
     plotting.box_plot_plotting(av_flow_bbox[::-1], top_categories_1[::-1],
                                ["Categories",
                                 "Average customers observations"],
@@ -37,17 +59,21 @@ def data_statistics(data):
                                "data/output_data/plots",
                                font_size=26)
 
+    # Distributions for category 2 computation
     categories_2_distribution = data[['category2']].groupby('category2').\
         size().sort_values(ascending=False)
 
+    # Output
     print(categories_2_distribution)
 
+    # Making plot for distributions
     plotting.horizontal_bar_plotting(categories_2_distribution.iloc[:10],
                                      ["Number", "Categories"],
                                      "Top 10 categories 2",
                                      "data/output_data/plots",
                                      font_size=26)
 
+    # Average clients flow box plot creation for categories 2
     av_flow_bbox = []
     top_categories_2 = categories_2_distribution.iloc[:10].index.values
 
@@ -55,6 +81,7 @@ def data_statistics(data):
         av_flow_bbox.append(
             data[data['category2'] == category_2]['av_flow'].values.flatten())
 
+    # Making visualization of box plot
     plotting.box_plot_plotting(av_flow_bbox[::-1], top_categories_2[::-1],
                                ["Categories",
                                 "Average customers observations"],
@@ -63,17 +90,21 @@ def data_statistics(data):
                                "data/output_data/plots",
                                font_size=26)
 
+    # Distributions for category 3 computation
     categories_3_distribution = data[['category3']].groupby('category3'). \
         size().sort_values(ascending=False)
 
+    # Output
     print(categories_3_distribution)
 
+    # Making plot for distributions
     plotting.horizontal_bar_plotting(categories_3_distribution.iloc[:10],
                                      ["Number", "Categories"],
                                      "Top 10 categories 3",
                                      "data/output_data/plots",
                                      font_size=26)
 
+    # Average clients flow box plot creation for categories 3
     av_flow_bbox = []
     top_categories_3 = categories_3_distribution.iloc[:10].index.values
 
@@ -81,6 +112,7 @@ def data_statistics(data):
         av_flow_bbox.append(
             data[data['category3'] == category_3]['av_flow'].values.flatten())
 
+    # Making visualization of box plot
     plotting.box_plot_plotting(av_flow_bbox[::-1], top_categories_3[::-1],
                                ["Categories",
                                 "Average customers observations"],
@@ -89,31 +121,40 @@ def data_statistics(data):
                                "data/output_data/plots",
                                font_size=26)
 
+    # Distributions for MCC 1 computation
     mcc_1_distribution = (data[['mcc_1']] * 87).round(decimals=0).\
         groupby('mcc_1').size().sort_values(ascending=False)
 
+    # Output
     print(mcc_1_distribution)
 
+    # Making plot for distributions
     plotting.horizontal_bar_plotting(mcc_1_distribution.iloc[:10],
                                      ["Number", "MCC"],
                                      "Top 10 MCC 1", "data/output_data/plots",
                                      font_size=26)
 
+    # Distributions for MCC 2 computation
     mcc_2_distribution = (data[['mcc_2']] * 87).round(decimals=0).\
         groupby('mcc_2').size().sort_values(ascending=False)
 
+    # Output
     print(mcc_2_distribution)
 
+    # Making plot for distributions
     plotting.horizontal_bar_plotting(mcc_2_distribution.iloc[:10],
                                      ["Number", "MCC"],
                                      "Top 10 MCC 2", "data/output_data/plots",
                                      font_size=26)
 
+    # Distributions for MCC 3 computation
     mcc_3_distribution = (data[['mcc_3']] * 87).round(decimals=0).\
         groupby('mcc_3').size().sort_values(ascending=False)
 
+    # Output
     print(mcc_3_distribution)
 
+    # Making plot for distributions
     plotting.horizontal_bar_plotting(mcc_3_distribution.iloc[:10],
                                      ["Number", "MCC 3"],
                                      "Top 10 MCC 3", "data/output_data/plots",
@@ -121,6 +162,7 @@ def data_statistics(data):
 
     print("\n")
 
+    # Hierarchy of the categories computation and plotting
     for category_1 in np.unique(data["category1"].values):
         print(category_1, " --->")
 
@@ -135,6 +177,7 @@ def data_statistics(data):
 
     print("\n")
 
+    # Sets of categories ensured by MCCs computation and plotting
     mcc_unique = np.unique(data[["mcc_1", "mcc_2", "mcc_3"]].values.flatten())
 
     for mcc in mcc_unique:
@@ -152,6 +195,15 @@ def data_statistics(data):
 
 
 def data_preprocessing(data):
+    """
+        Method to preprocess data into input and output sets for neural
+            networks.
+        param:
+            data - pf.DataFrame of data
+        return:
+            1. numpy array of data to input into neural network
+            2. numpy array of data as output of neural network
+    """
     input_embedded_set = []
     output_embedded_set = []
 
@@ -216,9 +268,22 @@ def data_preprocessing(data):
 
 
 def validation_set_creation(data):
+    """
+        Method to create validation set for hierarchical tree classifier.
+        param:
+            data - pf.DataFrame of data
+        return:
+            1. validation_set_input - numpy array of data to input into
+                hierarchical tree classifier on validation step
+            2. validation_set_output - numpy array of data as output from
+                hierarchical tree classifier on validation step
+    """
+    # Selecting data for validation set such every level 1 category is
+    # persisted
     categories_1_names = data[['category1']].groupby('category1').\
         size().sort_values(ascending=False).index.to_list()
 
+    # Validation set creation
     validation_set = pd.DataFrame(columns=data.columns)
 
     for category_1_name in categories_1_names:
@@ -232,10 +297,17 @@ def validation_set_creation(data):
     validation_set_input, validation_set_output = \
         data_preprocessing(validation_set)
 
-    return (validation_set_input, validation_set_output)
+    return validation_set_input, validation_set_output
 
 
 def node_data_statistics(data, folder):
+    """
+        Method to compute data statistics on the node.
+        param:
+            1. data - pd.DataFrame of the localized data
+            2. folder - string folder path
+    """
+    # Distribution o0f categories
     categories_distribution = data[['category']].groupby('category'). \
         size().sort_values(ascending=False)
 
@@ -244,6 +316,7 @@ def node_data_statistics(data, folder):
                                      "Top 10 categories", folder,
                                      font_size=26)
 
+    # Box plots for clients number by category
     av_flow_bbox = []
     top_categories = categories_distribution.iloc[:10].index.values
 
@@ -259,6 +332,7 @@ def node_data_statistics(data, folder):
                                folder,
                                font_size=26)
 
+    # MCC distribution computation
     mcc_distribution = (data[['mcc']] * 87).round(decimals=0).groupby('mcc'). \
         size().sort_values(ascending=False)
 
@@ -271,6 +345,15 @@ def node_data_statistics(data, folder):
 
 
 def node_data_embedding_creation(data, folder):
+    """
+        Method for output on the node binarization.
+        param:
+            1. data - pd.DataFrame of the localized data
+            2. folder - string folder
+        return:
+            1. data - input data for the prediction model
+            2. embedding_data_raw - dictionary of the embeddings
+    """
     unique_categories = np.unique(data['category'].values)
 
     encoding_model = sklearn.preprocessing.LabelBinarizer()
@@ -299,6 +382,13 @@ def node_data_embedding_creation(data, folder):
 
 
 def node_data_embedding_reading(folder):
+    """
+        Method to load embeddings from file.
+        param:
+            folder - string folder
+        return:
+            embedding_data_raw - dictionary of the embeddings
+    """
     embedding_data = pd.read_csv(folder + "/embedding_data.csv")
     unique_categories = embedding_data['category'].values
 
@@ -327,6 +417,17 @@ def node_data_embedding_reading(folder):
 def node_data_distortion(data,
                          exemplary_number_of_samples=4000,
                          distortion_weight=1e-1):
+    """
+        Method to increase and balance number of data for every category
+            using Gaussian distortion.
+        param:
+            data - pd.DataFrame of the localized data
+            exemplary_number_of_samples - to that number each category
+                should be increased (4000 as default)
+            distortion_weight - weights gaussian distortion (0.1 as default)
+        return:
+            data - pd.DataFrame of the localized data
+    """
     def transformation(row):
         return distortion_array[row.name, :]
 
@@ -427,6 +528,14 @@ def node_data_distortion(data,
 
 
 def node_data_preprocessing(data):
+    """
+        Method to preprocess localized data on the nodes.
+        param
+            data - pd.DataFrame of the localized data
+        return:
+            1. Input set
+            2. Output set
+    """
     input_embedded_set = []
     output_embedded_set = []
 
@@ -496,6 +605,14 @@ def node_data_preprocessing(data):
 
 
 def node_sets_creation(data):
+    """
+        Method to create training and validation sets on the node.
+        param:
+            data - pd.DataFrame of the localized data
+        return:
+            1. Tuple for training set
+            2. Tuple for validation set
+    """
     category_names = data[['category']].groupby('category'). \
         size().sort_values(ascending=False).index.to_list()
 
