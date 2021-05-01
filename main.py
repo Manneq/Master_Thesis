@@ -10,7 +10,7 @@ def main():
     data = data_management.data_loading("data/input_data/CFD_final_4.csv")
 
     # Data statistics printing
-    data_management.data_statistics(data)
+    #data_management.data_statistics(data)
 
     # Validation set creation
     validation_set = data_management.validation_set_creation(data)

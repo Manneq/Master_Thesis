@@ -327,9 +327,9 @@ class Node:
             return self.model.model_prediction(data)
 
 
-class MultiClassClassifier:
+class NeuralNetworkClassifier:
     """
-        Class for multi-class classifier.
+        Parent class for multi-label and binary classifiers.
     """
     # Dictionary of embeddings
     embedding_data = None
@@ -377,7 +377,7 @@ class MultiClassClassifier:
                        shuffle=True,
                        callbacks=[keras.callbacks.TerminateOnNaN(),
                                   keras.callbacks.EarlyStopping(
-                                      patience=20, restore_best_weights=True),
+                                      patience=5, restore_best_weights=True),
                                   keras.callbacks.ReduceLROnPlateau(
                                       patience=2, min_lr=1e-15),
                                   keras.callbacks.TensorBoard(
@@ -439,6 +439,30 @@ class MultiClassClassifier:
 
         return
 
+    def model_creation(self):
+        return
+
+    def model_prediction(self, prediction_set):
+        return
+
+
+class MultiClassClassifier(NeuralNetworkClassifier):
+    """
+        Class for multi-class classifier.
+    """
+    def __init__(self, embedding_data, output_shape, folder):
+        """
+            Method for class initialization.
+            param:
+                1. embedding_data - dictionary of embeddings
+                2. output_shape - number of neurons for the output layer
+                3. folder - string folder path
+        """
+        super(MultiClassClassifier, self).\
+            __init__(embedding_data, output_shape, folder)
+
+        return
+
     def model_prediction(self, prediction_set):
         """
             Method for model prediction.
@@ -491,19 +515,10 @@ class MultiClassClassifier:
         return
 
 
-class BinaryClassifier:
+class BinaryClassifier(NeuralNetworkClassifier):
     """
         Class for binary classifier.
     """
-    # Dictionary of embeddings
-    embedding_data = None
-    # Number of neurons for the output layer
-    output_shape = None
-    # String folder path
-    folder = None
-    # Keras model
-    model = None
-
     def __init__(self, embedding_data, output_shape, folder):
         """
             Method for class initialization.
@@ -512,94 +527,8 @@ class BinaryClassifier:
                 2. output_shape - number of neurons for the output layer
                 3. folder - string folder path
         """
-        self.embedding_data = embedding_data
-        self.output_shape = output_shape
-        self.folder = folder
-
-        return
-
-    def model_training_and_evaluation(self, training_set, validation_set,
-                                      batch_size=256, epochs=1000):
-        """
-            Method to train and evaluate neural network model.
-            param:
-                1. training_set - list of pd.DataFrames for training
-                2. validation_set - list of pd.DataFrames for validation
-                3 batch_size - batch size for training (256 as default)
-                4. epochs - number of epochs for training (1000 as default)
-        """
-        self.model_creation()
-
-        # Train model
-        self.model.fit(x=training_set[0],
-                       y=training_set[1],
-                       batch_size=batch_size,
-                       epochs=epochs,
-                       verbose=1,
-                       validation_data=(validation_set[0],
-                                        validation_set[1]),
-                       shuffle=True,
-                       callbacks=[keras.callbacks.TerminateOnNaN(),
-                                  keras.callbacks.EarlyStopping(
-                                      patience=20, restore_best_weights=True),
-                                  keras.callbacks.ReduceLROnPlateau(
-                                      patience=2, min_lr=1e-15),
-                                  keras.callbacks.TensorBoard(
-                                      log_dir=self.folder + "/logs",
-                                      batch_size=batch_size,
-                                      write_grads=True,
-                                      write_images=True)])
-
-        # Save weights
-        self.model.save_weights(self.folder + "/weights.h5")
-
-        model_name = '-'.join(self.folder.split("/")[2:])
-
-        # Model validation
-        output_predicted = \
-            np.rint(self.model.predict(x=validation_set[0],
-                                       batch_size=batch_size)).flatten()
-
-        # Metrics computation
-        validation_report = sklearn.metrics.classification_report(
-            validation_set[1].values.flatten(), output_predicted,
-            target_names=list(self.embedding_data.keys()), output_dict=True)
-
-        scores_validation = validation_report["macro avg"]
-        scores_validation["accuracy"] = \
-            sklearn.metrics.accuracy_score(validation_set[1].values,
-                                           output_predicted)
-        scores_validation["auc"] = \
-            sklearn.metrics.roc_auc_score(validation_set[1].values.flatten(),
-                                          output_predicted)
-        del scores_validation["support"]
-
-        # Metrics plotting
-        scores_validation = pd.Series(scores_validation)
-        plotting.vertical_bar_plotting(scores_validation,
-                                       ["Metrics", "Values"],
-                                       model_name + " metrics validation set",
-                                       self.folder, font_size=26)
-
-        # Metrics output
-        print("Model validation scores: \n", scores_validation)
-
-        # Metrics computation and plotting for every category
-        for category in list(self.embedding_data.keys()):
-            scores_validation = validation_report[category]
-            del scores_validation["support"]
-
-            scores_validation = pd.Series(scores_validation)
-            plotting.vertical_bar_plotting(scores_validation,
-                                           ["Metrics", "Values"],
-                                           model_name +
-                                           " metrics validation set (" +
-                                           category + ")",
-                                           self.folder, font_size=26)
-            print("Model validation scores (" + category + "): \n",
-                  scores_validation)
-
-        keras.backend.clear_session()
+        super(BinaryClassifier, self).\
+            __init__(embedding_data, output_shape, folder)
 
         return
 
