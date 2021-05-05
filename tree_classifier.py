@@ -15,7 +15,7 @@ import plotting
 """
 
 
-class TreeNeuralNetwork:
+class HierarchicalTreeClassifier:
     """
         Class for Hierarchical Tree Classifier.
     """
@@ -329,7 +329,7 @@ class Node:
 
 class NeuralNetworkClassifier:
     """
-        Parent class for multi-label and binary classifiers.
+        Parent class for multi-class and binary classifiers.
     """
     # Dictionary of embeddings
     embedding_data = None

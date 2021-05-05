@@ -1,4 +1,4 @@
-import tree_neural_network
+import tree_classifier
 import data_management
 
 
@@ -16,7 +16,7 @@ def main():
     validation_set = data_management.validation_set_creation(data)
 
     # Hierarchical tree classifier creation
-    neural_tree = tree_neural_network.TreeNeuralNetwork()
+    neural_tree = tree_classifier.HierarchicalTreeClassifier()
 
     # Hierarchical tree training
     neural_tree.training(data)
